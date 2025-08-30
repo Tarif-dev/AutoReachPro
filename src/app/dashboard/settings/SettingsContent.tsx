@@ -70,12 +70,26 @@ export default function SettingsContent({
   const handleProfileSave = async () => {
     setIsLoading(true);
     try {
-      // TODO: Add API call to update profile
-      console.log("Saving profile:", profileData);
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const response = await fetch("/api/profile", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(profileData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save profile");
+      }
+
+      const updatedProfile = await response.json();
+      console.log("Profile saved successfully:", updatedProfile);
+
+      // Show success message (you could add a toast notification here)
+      alert("Profile saved successfully!");
     } catch (error) {
       console.error("Error saving profile:", error);
+      alert("Failed to save profile. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -84,12 +98,26 @@ export default function SettingsContent({
   const handleSettingsSave = async () => {
     setIsLoading(true);
     try {
-      // TODO: Add API call to update settings
-      console.log("Saving settings:", settingsData);
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const response = await fetch("/api/settings", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(settingsData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save settings");
+      }
+
+      const updatedSettings = await response.json();
+      console.log("Settings saved successfully:", updatedSettings);
+
+      // Show success message
+      alert("Settings saved successfully!");
     } catch (error) {
       console.error("Error saving settings:", error);
+      alert("Failed to save settings. Please try again.");
     } finally {
       setIsLoading(false);
     }

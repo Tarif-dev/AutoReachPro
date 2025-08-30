@@ -14,9 +14,11 @@ import {
   Eye,
   Edit,
   Trash2,
+  Send,
 } from "lucide-react";
 import Link from "next/link";
 import { formatDate } from "@/lib/utils";
+import SendCampaignModal from "@/components/SendCampaignModal";
 
 interface Campaign {
   id: string;
@@ -38,6 +40,13 @@ interface CampaignsContentProps {
 export default function CampaignsContent({ campaigns }: CampaignsContentProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [sendModal, setSendModal] = useState<{
+    isOpen: boolean;
+    campaign: Campaign | null;
+  }>({
+    isOpen: false,
+    campaign: null,
+  });
 
   const filteredCampaigns = campaigns.filter((campaign) => {
     const matchesSearch = campaign.name
@@ -47,6 +56,20 @@ export default function CampaignsContent({ campaigns }: CampaignsContentProps) {
       statusFilter === "all" || campaign.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
+
+  const handleSendCampaign = (campaign: Campaign) => {
+    setSendModal({ isOpen: true, campaign });
+  };
+
+  const handleSendSuccess = (results: any) => {
+    console.log("Campaign sent successfully:", results);
+    // Refresh campaigns or update the UI
+    window.location.reload(); // Simple refresh for now
+  };
+
+  const handleCloseSendModal = () => {
+    setSendModal({ isOpen: false, campaign: null });
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -234,6 +257,16 @@ export default function CampaignsContent({ campaigns }: CampaignsContentProps) {
                         >
                           <Eye className="h-4 w-4" />
                         </Link>
+                        {campaign.status !== "sent" &&
+                          campaign.status !== "sending" && (
+                            <button
+                              onClick={() => handleSendCampaign(campaign)}
+                              className="text-green-600 hover:text-green-500 p-1 hover:bg-green-50 rounded"
+                              title="Send Campaign"
+                            >
+                              <Send className="h-4 w-4" />
+                            </button>
+                          )}
                         <Link
                           href={`/dashboard/campaigns/${campaign.id}/edit`}
                           className="text-gray-600 hover:text-gray-500 p-1 hover:bg-gray-50 rounded"
@@ -320,6 +353,16 @@ export default function CampaignsContent({ campaigns }: CampaignsContentProps) {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Send Campaign Modal */}
+      {sendModal.campaign && (
+        <SendCampaignModal
+          campaign={sendModal.campaign}
+          isOpen={sendModal.isOpen}
+          onClose={handleCloseSendModal}
+          onSuccess={handleSendSuccess}
+        />
       )}
     </div>
   );
